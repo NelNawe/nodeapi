@@ -1,6 +1,9 @@
 const express = require('express')
 let monuments = require('./monuments-list')
+const favicon = require('serve-favicon')
 const app = express()
+
+app.use(favicon(__dirname + '/favicon.ico'))
 
 app.get('/', (req, res) => {
     res.send('Hello, Express !')
