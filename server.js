@@ -1,9 +1,23 @@
 const express = require('express')
 let monuments = require('./monuments-list')
 const favicon = require('serve-favicon')
+const morgan = require('morgan')
 const app = express()
 
-app.use(favicon(__dirname + '/favicon.ico'))
+function nightBlocker (req, res, next){
+    const hour = new Date().getHours();
+    if(hour >= 0 && hour < 6 ){
+        res.status(503).json({message: "Le serveur est en cours de maintenance", data: null})
+    }else{
+        next();
+    }
+}
+
+app
+    .use(nightBlocker)
+    .use(favicon(__dirname + '/favicon.ico'))
+    .use(morgan("dev"))
+    
 
 app.get('/', (req, res) => {
     res.send('Hello, Express !')
