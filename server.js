@@ -4,6 +4,7 @@ const favicon = require('serve-favicon')
 const morgan = require('morgan')
 const app = express()
 
+
 function nightBlocker (req, res, next){
     const hour = new Date().getHours();
     if(hour >= 0 && hour < 6 ){
@@ -14,6 +15,8 @@ function nightBlocker (req, res, next){
 }
 
 app
+    .use(express.json())
+    .use(express.urlencoded({ extended: true }))
     .use(nightBlocker)
     .use(favicon(__dirname + '/favicon.ico'))
     .use(morgan("dev"))
@@ -37,6 +40,13 @@ app.get('/monuments', (req, res) => {
     res.json({message, data})
 })
 
+app.post('/monuments', (req, res) => {
+    const id = 123
+    const monumentCreated = { ...req.body, ...{id: id, created: new Date()} }
+    monuments.push(monumentCreated)
+    const message = `Le monument avec l'id ${id} a bien été ajouté`
+    res.json({message, data: monumentCreated})
+})
 
 
 app.listen(3000, () => console.log('Server running at http://localhost:3000'))
