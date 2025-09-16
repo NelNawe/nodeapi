@@ -49,5 +49,27 @@ app.post('/monuments', (req, res) => {
 })
 
 
+app.put('/monuments/:id', (req, res) => {
+    const id = parseInt(req.params.id)
+    const monumentUpdated = { ...req.body, id: id }
+    monuments = monuments.map(m => {
+        return m.id === id ? monumentUpdated : m
+    })
+    const message = `Le monument avec l'id ${id} a bien été modifié.`
+    res.json({message, data: monumentUpdated})
+})
+
+
+app.delete('/monuments/:id', (req, res) => {    
+    const id = parseInt(req.params.id)
+    const monumentDeleted = monuments.find(m => m.id === id)
+    monuments = monuments.filter(m => m.id !== id)
+    
+    const message = `Le monument avec l'id ${id} a bien été supprimé.`
+    res.json({message, data: monumentDeleted})
+})
+
+
+
 app.listen(3000, () => console.log('Server running at http://localhost:3000'))
 
