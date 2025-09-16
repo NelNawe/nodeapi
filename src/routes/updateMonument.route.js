@@ -17,6 +17,11 @@ module.exports = (app) => {
             })
         })
         .catch(error => {
+            if(error.name === "SequelizeValidationError"){  
+                const validationErrors = error.errors.map(e => e.message);
+                const message = "Le monument n'a pas pu être modifié. Vérifiez les informations saisies.";
+                return res.status(400).json({ message, data: validationErrors });
+            }
             const message = "Le monument n'a pas pu être mis à jour. Réessayez dans quelques instants."
             return res.status(500).json({ message, data: error })
         });
