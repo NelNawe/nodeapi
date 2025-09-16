@@ -9,7 +9,7 @@ module.exports = (app) => {
             })
             .catch(error => {
                 const message = "La liste des monuments n'a pas pu être récupérée. Réessayez dans quelques instants."
-                res.status(500).json({ message, data: error })
+                return res.status(500).json({ message, data: error })
             });
     });
 }

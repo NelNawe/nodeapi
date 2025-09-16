@@ -27,7 +27,11 @@ app.get('/', (req, res) => {
     res.send('Hello, Express !')
 })
 
-require('./src/routes/findAllMonuments.route')(app);
+require('./src/routes/findAllMonuments.route')(app)
+require('./src/routes/findMonumentByPK.route')(app)
+require('./src/routes/createMonument.route')(app)
+require('./src/routes/updateMonument.route')(app)
+require('./src/routes/deleteMonument.route')(app)
 
 app.listen(3000, () => console.log('Server running at http://localhost:3000'))
 
