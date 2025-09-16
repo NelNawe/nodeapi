@@ -3,7 +3,28 @@ let monuments = require('./monuments-list')
 const favicon = require('serve-favicon')
 const morgan = require('morgan')
 const app = express()
+const { Sequelize, DataTypes } = require('sequelize');
 
+const sequelize = new Sequelize(
+    'monumento',
+    'root',
+    'root',
+    {
+        host: 'localhost',
+        port : 8889,
+        dialect: 'mysql',
+        logging: true
+    }
+);
+
+sequelize
+        .authenticate()
+        .then(() => {
+            console.log('La connexion à la base de données a été établie avec succès.');
+        })
+        .catch(err => {
+            console.error('Impossible de se connecter à la BDD:', err);
+        });
 
 function nightBlocker (req, res, next){
     const hour = new Date().getHours();
