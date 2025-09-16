@@ -7,7 +7,19 @@ module.exports = (sequelize, DataTypes) => {
     },
     title: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: 'Le titre du monument est obligatoire.'
+        },
+        notEmpty: {
+          msg: 'Le titre du monument est obligatoire.'
+        },
+        len: {
+          args: [3, 70],
+          msg: 'Le titre du monument doit contenir entre 3 et 70 caractères.'  
+        }
+      }
     },
     country: {
       type: DataTypes.STRING,
