@@ -18,6 +18,12 @@ module.exports = (sequelize, DataTypes) => {
         len: {
           args: [3, 70],
           msg: 'Le titre du monument doit contenir entre 3 et 70 caractères.'  
+        },
+        noForbiddenWords(value) {
+          const forbiddenWords = ['test', 'fake', 'demo', 'example'];
+          if(forbiddenWords.some(word => value.toLowerCase().includes(word))) {
+            throw new Error('Le titre contient des mots interdits.');
+          }
         }
       }
     },
@@ -90,6 +96,14 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     timestamps: true,
     createdAt: 'created',
-    updatedAt: false
+    updatedAt: false,
+    validate : { 
+      cityNotEqualsCountry() {
+        if(this.city && this.country && this.city.toLowerCase() === this.country.toLowerCase()) {
+          throw new Error("La ville et le pays doivent être différents.");
+        }
+      }
+    }
+
   });
 }
