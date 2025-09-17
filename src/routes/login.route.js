@@ -4,9 +4,19 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const privateKey = fs.readFileSync('./src/auth/jwtRS256.key');
 const { handleError } = require('../../helper');
+const rateLimit = require('express-rate-limit');
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5, 
+    message: {
+        message: "Trop de tentatives de connexion. Veuillez réessayer plus tard.",
+        data: null
+    }
+});     
 
 module.exports = (app) => {
-    app.post('/login', async (req, res) => {
+    app.post('/login', loginLimiter, async (req, res) => {
         const { username, password } = req.body;
 
         if (!username || !password) {
