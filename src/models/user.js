@@ -24,6 +24,14 @@ module.exports = (sequelize, DataTypes) => {
                 len: { args: [6, 100], msg: "Le mot de passe doit contenir au moins 6 caractères" },
             },
         },
+        refreshToken: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+        },
+        refreshTokenExpiry: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        }
     }, {
         timestamps: true,
         createdAt: 'created',

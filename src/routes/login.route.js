@@ -17,28 +17,38 @@ module.exports = (app) => {
         }
 
         try {
-            // Vérification si l'utilisateur existe
             const user = await UserModel.findOne({ where: { username } });
             if (!user) {
                 return res.status(401).json({ message: "Utilisateur non trouvé", data: null });
             }
 
-            // Vérification du mot de passe
             const isMatch = await bcrypt.compare(password, user.password);
             if (!isMatch) {
                 return res.status(401).json({ message: "Mot de passe incorrect", data: null });
             }
 
-            // Génération du token JWT
-            const token = jwt.sign(
+            const accessToken = jwt.sign(
                 { userName: user.username }, 
                 privateKey, 
-                { algorithm: 'RS256', expiresIn: '1h' }
+                { algorithm: 'RS256', expiresIn: '1m' }
             );
+
+            const refreshToken = jwt.sign(
+                { userName: user.username }, 
+                privateKey, 
+                { algorithm: 'RS256', expiresIn: '7d' }
+            );
+
+            const decodedRefreshToken = jwt.decode(refreshToken);
+            const refreshTokenExpiry = new Date(decodedRefreshToken.exp * 1000);
+                
+            user.refreshToken = refreshToken;
+            user.refreshTokenExpiry = refreshTokenExpiry;
+            await user.save();
 
             return res.json({ 
                 message: "Authentification réussie", 
-                data: { userId: user.id, token } 
+                data: { userId: user.id, accessToken, refreshToken } 
             });
 
         } catch (error) {
