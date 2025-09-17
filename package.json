@@ -10,7 +10,10 @@
   "author": "Elie",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "express": "^5.1.0",
+    "fs": "^0.0.1-security",
+    "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.5",
     "sequelize": "^6.37.7",
     "serve-favicon": "^2.5.1"
