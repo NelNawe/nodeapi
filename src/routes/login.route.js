@@ -3,38 +3,47 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const privateKey = fs.readFileSync('./src/auth/jwtRS256.key');
+const { handleError } = require('../helper');
 
 module.exports = (app) => {
-    app.post('/login', (req, res) => {
+    app.post('/login', async (req, res) => {
         const { username, password } = req.body;
+
         if (!username || !password) {
-            return res.status(400).json({ message: "Le nom d'utilisateur et le mot de passe sont requis", data: null });
+            return res.status(400).json({ 
+                message: "Le nom d'utilisateur et le mot de passe sont requis", 
+                data: null 
+            });
         }
 
-        UserModel.findOne({ where: { username } })
-            .then(user => {
-                if (!user) {
-                    return res.status(401).json({ message: "Utilisateur non trouvé", data: null });
-                }
-                
-                bcrypt.compare(password, user.password)
-                    .then(isMatch => {
-                        if (!isMatch) {
-                            return res.status(401).json({ message: "Mot de passe incorrect", data: null });
-                        }
-                        
-                        const token = jwt.sign( 
-                            { userName: user.username },
-                            privateKey,
-                            { algorithm: 'RS256', expiresIn: '1h' }
-                        );
+        try {
+            // Vérification si l'utilisateur existe
+            const user = await UserModel.findOne({ where: { username } });
+            if (!user) {
+                return res.status(401).json({ message: "Utilisateur non trouvé", data: null });
+            }
 
-                        res.json({ message: "Authentification réussie", data: { userId: user.id, token } });
-                    })
-            })
-            .catch(err => {
-                console.error('Erreur lors de la recherche de l\'utilisateur:', err);
-                res.status(500).json({ message: "Erreur serveur", data: null });
+            // Vérification du mot de passe
+            const isMatch = await bcrypt.compare(password, user.password);
+            if (!isMatch) {
+                return res.status(401).json({ message: "Mot de passe incorrect", data: null });
+            }
+
+            // Génération du token JWT
+            const token = jwt.sign(
+                { userName: user.username }, 
+                privateKey, 
+                { algorithm: 'RS256', expiresIn: '1h' }
+            );
+
+            return res.json({ 
+                message: "Authentification réussie", 
+                data: { userId: user.id, token } 
             });
+
+        } catch (error) {
+            message = 'Erreur lors de l\'authentification'
+            return handleError(res, error, message);
+        }
     });
 };
