@@ -26,7 +26,7 @@ module.exports = (app) => {
                         const token = jwt.sign( 
                             { userName: user.username },
                             privateKey,
-                            { algorithm: 'RS256', expiresIn: '1m' }
+                            { algorithm: 'RS256', expiresIn: '1h' }
                         );
 
                         res.json({ message: "Authentification réussie", data: { userId: user.id, token } });
