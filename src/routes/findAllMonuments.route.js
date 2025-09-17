@@ -1,6 +1,6 @@
 const { MonumentModel } = require('../db/sequelize');
 const { Op } = require('sequelize');
-const { handleError } = require('../helper');
+const { handleError } = require('../../helper');
 
 module.exports = (app) => {
     app.get('/monuments', async (req, res) => {

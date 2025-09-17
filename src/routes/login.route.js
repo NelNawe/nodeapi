@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const privateKey = fs.readFileSync('./src/auth/jwtRS256.key');
-const { handleError } = require('../helper');
+const { handleError } = require('../../helper');
 
 module.exports = (app) => {
     app.post('/login', async (req, res) => {

@@ -1,6 +1,5 @@
 const { handleError } = require('../../helper');
 const { MonumentModel } = require('../db/sequelize');
-const { handleError } = require('../helper');
 
 module.exports = (app) => {
     app.delete('/monuments/:id', async (req, res) => {
