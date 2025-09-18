@@ -65,7 +65,7 @@ module.exports = (app) => {
             const accessToken = jwt.sign(
                 { userName: user.username }, 
                 privateKey, 
-                { algorithm: 'RS256', expiresIn: '1m' }
+                { algorithm: 'RS256', expiresIn: '30m' }
             );
 
             const refreshToken = jwt.sign(
