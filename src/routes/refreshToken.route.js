@@ -7,7 +7,7 @@ const publicKey = fs.readFileSync('./src/auth/jwtRS256.key');
 const { Op } = require('sequelize');
 
 module.exports = (app) => {
-    app.post('/refresh-token', async (req, res) => {
+    app.post('/api/refresh-token', async (req, res) => {
         const { refreshToken } = req.body;
         
         if (!refreshToken) {   

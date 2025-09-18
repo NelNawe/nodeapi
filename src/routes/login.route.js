@@ -16,7 +16,7 @@ const loginLimiter = rateLimit({
 });     
 
 module.exports = (app) => {
-    app.post('/login', loginLimiter, async (req, res) => {
+    app.post('/api/login', loginLimiter, async (req, res) => {
         const { username, password } = req.body;
 
         if (!username || !password) {
