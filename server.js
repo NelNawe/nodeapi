@@ -1,9 +1,70 @@
 const express = require('express')
 const favicon = require('serve-favicon')
 const morgan = require('morgan')
-const app = express()
 const sequelize = require('./src/db/sequelize')
 const auth = require('./src/auth/auth')
+const http = require('http');
+const fs = require('fs');
+const jwt = require('jsonwebtoken');
+const { Server } = require('socket.io');
+const publicKey = fs.readFileSync('./src/auth/jwtRS256.key.pub');
+
+const app = express()
+const server = http.createServer(app);
+
+const io = new Server(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+
+io.use((socket, next) => {
+    const token = socket.handshake.auth?.token;
+    if (!token) {
+        return next(new Error("Token manquant"));
+    }
+
+    jwt.verify(token, publicKey, { algorithms: ['RS256'] }, (err, decoded) => {
+        if (err) {
+            return next(new Error("Token invalide"));
+        }
+        socket.user = decoded;
+        next();
+    }); 
+});
+
+let message = {};
+
+io.on('connection', (socket) => {
+    console.log('Un utilisateur est connecté');
+
+    socket.on("joinMonument", ({monumentId, role}) => {
+        socket.join(`monument_${monumentId}`);
+        console.log(`${socket.user.username} a rejoint la salle monument_${monumentId} en tant que ${role}`);
+
+        if(!message[monumentId]) 
+            message[monumentId] = [];
+
+        socket.emit("chatHistory", message[monumentId]);
+    });
+
+    socket.on("sendMessage", ({monumentId, role, message}) => {
+        const msg = {
+            user: socket.user.username,
+            role,
+            message,
+            date: new Date()
+        };
+
+        message[monumentId].push(msg);
+        io.to(`monument_${monumentId}`).emit("newMessage", msg);
+    });
+    
+    socket.on('disconnect', () => {
+        console.log('Un utilisateur est déconnecté');
+    });
+});
 
 
 
@@ -58,6 +119,5 @@ app.use((req, res) => {
     res.status(404).json({ message, data: null })
 })
 
-
-app.listen(3000, () => console.log('Server running at http://localhost:3000'))
+server.listen(3000, () => console.log('Server & Socket.io running at http://localhost:3000'))
 
