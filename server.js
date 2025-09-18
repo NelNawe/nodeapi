@@ -32,14 +32,21 @@ app.get('/', (req, res) => {
     res.send('Bienvenue sur l\'API Monumento ! Utilisez les routes pour interagir avec les monuments.')
 })
 
+// Monuments routes
 require('./src/routes/findAllMonuments.route')(app)
 require('./src/routes/searchMonuments.route')(app)
 require('./src/routes/findMonumentByPK.route')(app)
 require('./src/routes/createMonument.route')(app)
 require('./src/routes/updateMonument.route')(app)
 require('./src/routes/deleteMonument.route')(app)
+
+// Anecdote routes
 require('./src/routes/findAnecdotesByMonument.route')(app)
 require('./src/routes/createAnecdotes.route')(app)
+require('./src/routes/updateAnecdote.route')(app)
+require('./src/routes/deleteAnecdote.route')(app)
+
+// User routes
 require('./src/routes/login.route')(app)
 require('./src/routes/register.route')(app)
 require('./src/routes/refreshToken.route')(app)
