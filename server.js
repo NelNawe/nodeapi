@@ -34,30 +34,30 @@ io.use((socket, next) => {
     }); 
 });
 
-let message = {};
+let messages = {};
 
 io.on('connection', (socket) => {
     console.log('Un utilisateur est connecté');
 
     socket.on("joinMonument", ({monumentId, role}) => {
         socket.join(`monument_${monumentId}`);
-        console.log(`${socket.user.username} a rejoint la salle monument_${monumentId} en tant que ${role}`);
+        console.log(`${socket.user.userName} a rejoint la salle monument_${monumentId} en tant que ${role}`);
 
-        if(!message[monumentId]) 
-            message[monumentId] = [];
+        if(!messages[monumentId]) 
+            messages[monumentId] = [];
 
-        socket.emit("chatHistory", message[monumentId]);
+        socket.emit("chatHistory", messages[monumentId]);
     });
 
     socket.on("sendMessage", ({monumentId, role, message}) => {
         const msg = {
-            user: socket.user.username,
+            user: socket.user.userName,
             role,
             message,
             date: new Date()
         };
 
-        message[monumentId].push(msg);
+        messages[monumentId].push(msg);
         io.to(`monument_${monumentId}`).emit("newMessage", msg);
     });
     
