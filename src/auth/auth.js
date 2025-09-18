@@ -4,7 +4,7 @@ const publicKey = fs.readFileSync('./src/auth/jwtRS256.key.pub');
 
 module.exports = (req, res, next) => {
 
-    if(req.path === '/login' || req.path === '/register' || req.path === '/refresh-token') {
+    if(req.path === '/api/login' || req.path === '/api/register' || req.path === '/api/refresh-token' || req.path === '/api-docs' || req.path.startsWith('/api-docs/')) {
         return next();
     }
 

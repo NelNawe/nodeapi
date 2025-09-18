@@ -26,6 +26,7 @@ app
     .use(morgan("dev"))
     .use(auth)
     
+require('./src/docs/swagger')(app)
 
 app.get('/', (req, res) => {
     res.send('Bienvenue sur l\'API Monumento ! Utilisez les routes pour interagir avec les monuments.')

@@ -14,7 +14,32 @@ const loginLimiter = rateLimit({
         data: null
     }
 });     
-
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Connexion utilisateur
+ *     description: Authentifie un utilisateur et retourne un accessToken et un refreshToken.
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LoginRequest'
+ *     responses:
+ *       200:
+ *         description: Connexion réussie
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LoginResponse'
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ */
 module.exports = (app) => {
     app.post('/api/login', loginLimiter, async (req, res) => {
         const { username, password } = req.body;
