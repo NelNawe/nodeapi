@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test WebSocket - Notifications Monuments</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .notification {
+            background-color: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .notification h3 {
+            color: #2e7d32;
+            margin: 0 0 10px 0;
+        }
+        .notification p {
+            margin: 5px 0;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .connected {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .token-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .connect-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .connect-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test WebSocket - Notifications Monuments</h1>
+    
+    <div id="status" class="status disconnected">
+        Déconnecté
+    </div>
+    
+    <input type="text" id="tokenInput" class="token-input" placeholder="Entrez votre token JWT ici">
+    <button id="connectBtn" class="connect-btn" onclick="connect()">Se connecter</button>
+    
+    <h2>Notifications reçues :</h2>
+    <div id="notifications"></div>
+
+    <script>
+        let socket = null;
+        
+        function connect() {
+            const token = document.getElementById('tokenInput').value;
+            if (!token) {
+                alert('Veuillez entrer un token JWT');
+                return;
+            }
+            
+            if (socket) {
+                socket.disconnect();
+            }
+            
+            socket = io('http://localhost:3000', {
+                auth: {
+                    token: token
+                }
+            });
+            
+            socket.on('connect', () => {
+                updateStatus('Connecté', true);
+                addNotification('Connexion WebSocket établie', 'info');
+            });
+            
+            socket.on('disconnect', () => {
+                updateStatus('Déconnecté', false);
+                addNotification('Connexion WebSocket fermée', 'info');
+            });
+            
+            socket.on('connect_error', (error) => {
+                updateStatus('Erreur de connexion', false);
+                addNotification('Erreur de connexion: ' + error.message, 'error');
+            });
+            
+            // Écouter les notifications de nouveaux monuments
+            socket.on('newMonument', (data) => {
+                addNotification(`Nouveau monument créé !`, 'success', data);
+            });
+        }
+        
+        function updateStatus(message, connected) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + (connected ? 'connected' : 'disconnected');
+        }
+        
+        function addNotification(title, type, data = null) {
+            const notificationsDiv = document.getElementById('notifications');
+            const notificationDiv = document.createElement('div');
+            notificationDiv.className = 'notification';
+            
+            let content = `<h3>${title}</h3>`;
+            content += `<p><strong>Heure:</strong> ${new Date().toLocaleString()}</p>`;
+            
+            if (data) {
+                content += `<p><strong>ID:</strong> ${data.id}</p>`;
+                content += `<p><strong>Titre:</strong> ${data.title}</p>`;
+                content += `<p><strong>Description:</strong> ${data.description}</p>`;
+                content += `<p><strong>Créé le:</strong> ${new Date(data.createdAt).toLocaleString()}</p>`;
+            }
+            
+            notificationDiv.innerHTML = content;
+            notificationsDiv.insertBefore(notificationDiv, notificationsDiv.firstChild);
+        }
+        
+        // Instructions pour l'utilisateur
+        addNotification('Instructions', 'info', {
+            id: 'N/A',
+            title: 'Comment tester',
+            description: '1. Connectez-vous via POST /api/login pour obtenir un token JWT. 2. Collez le token dans le champ ci-dessus. 3. Cliquez sur "Se connecter". 4. Créez un nouveau monument via POST /api/monuments pour voir la notification en temps réel.',
+            createdAt: new Date().toISOString()
+        });
+    </script>
+</body>
+</html>

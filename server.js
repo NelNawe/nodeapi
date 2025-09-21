@@ -4,7 +4,7 @@ const morgan = require('morgan')
 const sequelize = require('./src/db/sequelize')
 const auth = require('./src/auth/auth')
 const http = require('http');
-const setupSocketServer = require('./src/socket');
+const { setupSocketServer } = require('./src/socket');
 
 
 const app = express()
@@ -54,6 +54,11 @@ require('./src/routes/deleteAnecdote.route')(app)
 require('./src/routes/login.route')(app)
 require('./src/routes/register.route')(app)
 require('./src/routes/refreshToken.route')(app)
+
+// Favorite routes
+require('./src/routes/getFavorites.route')(app)
+require('./src/routes/addFavorite.route')(app)
+require('./src/routes/removeFavorite.route')(app)
 
 app.use((req, res) => {
     const url = req.originalUrl

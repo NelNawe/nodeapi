@@ -4,6 +4,7 @@ const publicKey = fs.readFileSync('./src/auth/jwtRS256.key.pub');
 const { Server } = require('socket.io');
 
 let messages = {};
+let ioInstance = null;
 
 function setupSocketServer(server) {
     const io = new Server(server, {
@@ -13,8 +14,11 @@ function setupSocketServer(server) {
         }
     });
 
+    // Stocker l'instance io pour l'utiliser dans les routes
+    ioInstance = io;
+
     io.use((socket, next) => {
-        const token = socket.handshake.auth?.token;
+        const token = socket.handshake.auth?.token || socket.handshake.headers?.token;
         if (!token) {
             return next(new Error("Token manquant"));
         }
@@ -61,4 +65,15 @@ function setupSocketServer(server) {
     return io;
 }
 
-module.exports = setupSocketServer;
+// Fonction pour envoyer des notifications depuis les routes
+function sendNotification(event, data) {
+    if (ioInstance) {
+        ioInstance.emit(event, data);
+        console.log(`Notification envoyée: ${event}`, data);
+    }
+}
+
+module.exports = {
+    setupSocketServer,
+    sendNotification
+};
